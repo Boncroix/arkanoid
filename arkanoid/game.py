@@ -1,9 +1,5 @@
 import pygame
-
-# CONSTANTES PANTALLA
-ALTO = 600
-ANCHO = 800
-COLOR_FONDO = (99, 0, 0)
+from . import ANCHO, ALTO, COLOR_FONDO
 
 
 class Arkanoid():
@@ -30,4 +26,3 @@ if __name__ == '__main__':
     print('Arrancamos desde el archivo game.py')
     juego = Arkanoid()
     juego.jugar
-
