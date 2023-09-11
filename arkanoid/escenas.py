@@ -1,4 +1,11 @@
+# librerias estándar        orden de las librerias
+import os
+
+# librerias de terceros
 import pygame as pg
+
+# tus dependencias librerias creadas por nosotros
+from . import ANCHO, ALTO
 
 
 class Escena:
@@ -17,6 +24,10 @@ class Escena:
 class Portada(Escena):
     def __init__(self, pantalla):
         super().__init__(pantalla)
+        # windows: resources\images\arkanoid_name.png
+        # mac/linux: resource/images/arkanoid_name.png   os.path.join selecciona las barras independientemente del sistema operativo
+        ruta = os.path.join('resources', 'images', 'arkanoid_name.png')
+        self.logo = pg.image.load(ruta)
 
     def bucle_principal(self):
         super().bucle_principal()
@@ -26,7 +37,15 @@ class Portada(Escena):
                 if evento.type == pg.QUIT:
                     salir = True
             self.pantalla.fill((99, 0, 0))
+            self.pintar_logo()
             pg.display.flip()
+
+    def pintar_logo(self):
+        ancho, alto = self.logo.get_size()
+        pos_x = (ANCHO - ancho) / 2
+        pos_y = (ALTO - alto) / 2
+        self.pantalla.blit(
+            self.logo, (pos_x, pos_y))
 
 
 class Partida(Escena):
