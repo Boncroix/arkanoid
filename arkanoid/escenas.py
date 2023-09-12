@@ -5,12 +5,14 @@ import os
 import pygame as pg
 
 # tus dependencias
-from . import ALTO, ANCHO
+from . import ALTO, ANCHO, FPS
+from .entidades import Raqueta
 
 
 class Escena:
     def __init__(self, pantalla):
         self.pantalla = pantalla
+        self.reloj = pg.time.Clock()
 
     def bucle_principal(self):
         """
@@ -62,16 +64,32 @@ class Portada(Escena):
 
 
 class Partida(Escena):
+    def __init__(self, pantalla):
+        super().__init__(pantalla)
+
+        ruta_fondo = os.path.join('resources', 'images', 'background.jpg')
+        self.fondo = pg.image.load(ruta_fondo)
+        self.jugador = Raqueta()
+
     def bucle_principal(self):
         super().bucle_principal()
         print('Estamos en el bucle principal de PARTIDA')
         salir = False
         while not salir:
+            self.reloj.tick(FPS)
             for evento in pg.event.get():
                 if evento.type == pg.QUIT:
                     return True
-            self.pantalla.fill((0, 99, 0))
+            self.pintar_fondo()
+            self.jugador.update()
+            self.pantalla.blit(self.jugador.image, self.jugador.rect)
             pg.display.flip()
+
+    def pintar_fondo(self):
+        self.pantalla.fill((0, 0, 99))
+        # TODO: mejorar la lógica para 'rellenar' el fondo
+        self.pantalla.blit(self.fondo, (0, 0))
+        self.pantalla.blit(self.fondo, (600, 0))
 
 
 class MejoresJugadores(Escena):
