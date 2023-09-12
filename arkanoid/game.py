@@ -30,7 +30,11 @@ class Arkanoid():
 
     def jugar(self):
         for escena in self.escenas:
-            escena.bucle_principal()
+            he_acabado = escena.bucle_principal()
+            if he_acabado:
+                print('La escena me pide que acabe el juego')
+                break
+        print('He salido del bucle for de las escenas')
 
         pg.quit()
 
