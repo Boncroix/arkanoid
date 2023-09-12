@@ -1,13 +1,12 @@
 import pygame as pg
-from . import ANCHO, ALTO, COLOR_FONDO
+
+from . import ALTO, ANCHO
 from .escenas import MejoresJugadores, Partida, Portada
-# from arkanoid.escenas import MejoresJugadores, Partida, Portada
 
 
-class Arkanoid():
+class Arkanoid:
     def __init__(self):
         pg.init()
-        pg.display.set_caption('Arkanoid')
         self.pantalla = pg.display.set_mode((ANCHO, ALTO))
 
         portada = Portada(self.pantalla)
@@ -20,13 +19,12 @@ class Arkanoid():
             records
         ]
 
-        '''
-        # Escrito de forma abreviada, creamos una lista con los objetos
-        self.escenas = [
-            Portada(self.pantalla),
-            Partida(self.pantalla),
-            MejoresJugadores(self.pantalla)
-        ]   '''
+        # Escrito de forma abreviada
+        # self.escenas = [
+        #     Portada(self.pantalla),
+        #     Partida(self.pantalla),
+        #     MejoresJugadores(self.pantalla)
+        # ]
 
     def jugar(self):
         for escena in self.escenas:
@@ -42,4 +40,4 @@ class Arkanoid():
 if __name__ == '__main__':
     print('Arrancamos desde el archivo game.py')
     juego = Arkanoid()
-    juego.jugar
+    juego.jugar()
