@@ -3,10 +3,11 @@ import os
 
 # librerías de terceros
 import pygame as pg
+from random import randint, choice
 
 # tus dependencias
 from . import ALTO, ANCHO, FPS
-from .entidades import Raqueta
+from .entidades import Raqueta, Pelota
 
 
 class Escena:
@@ -70,6 +71,7 @@ class Partida(Escena):
         ruta_fondo = os.path.join('resources', 'images', 'background.jpg')
         self.fondo = pg.image.load(ruta_fondo)
         self.jugador = Raqueta()
+        self.pelota = Pelota(self.jugador.rect)
 
     def bucle_principal(self):
         super().bucle_principal()
@@ -83,7 +85,16 @@ class Partida(Escena):
             self.pintar_fondo()
             self.jugador.update()
             self.pantalla.blit(self.jugador.image, self.jugador.rect)
+            self.comprobar_colision()
+            self.pantalla.blit(self.pelota.pelota, self.pelota.rect)
             pg.display.flip()
+
+    def comprobar_colision(self):
+        self.pelota.mover()
+        if self.pelota.rect.colliderect(self.jugador.rect):
+            self.pelota.velocidad_y = randint(-self.pelota.vel_pelota, -5)
+            self.pelota.velocidad_x = choice(
+                [-self.pelota.vel_pelota, self.pelota.vel_pelota])
 
     def pintar_fondo(self):
         self.pantalla.fill((0, 0, 99))
