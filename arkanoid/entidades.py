@@ -40,15 +40,14 @@ class Raqueta(pg.sprite.Sprite):
         # Margenes para que la raqueta no se salga de la pantalla
         estado_teclas = pg.key.get_pressed()
         if estado_teclas[pg.K_LEFT]:
-            if self.rect.x <= 0:
-                self.rect.x = 0
-            else:
-                self.rect.x -= self.vel_raqueta
+            self.rect.x -= self.vel_raqueta
+            if self.rect.left < 0:
+                self.rect.left = 0
+
         if estado_teclas[pg.K_RIGHT]:
-            if self.rect.x >= ANCHO - self.rect.width:
-                self.rect.x = ANCHO - self.rect.width
-            else:
-                self.rect.x += self.vel_raqueta
+            self.rect.x += self.vel_raqueta
+            if self.rect.right > ANCHO:
+                self.rect.right = ANCHO
 
 
 class Pelota:
@@ -86,3 +85,16 @@ class Pelota:
             if self.rect.x >= ANCHO - self.rect.width:
                 self.rect.x = ANCHO - self.rect.width
                 self.velocidad_x = -self.velocidad_x
+
+
+class Ladrillo(pg.sprite.Sprite):
+
+    def __init__(self):
+        super().__init__()
+        ruta_verde = os.path.join('resources', 'images', 'greenTile.png')
+        self.image = pg.image.load(ruta_verde)
+
+        self.rect = self.image.get_rect()
+
+    def undate(self):
+        pass
