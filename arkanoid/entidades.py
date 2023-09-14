@@ -37,6 +37,7 @@ class Raqueta(pg.sprite.Sprite):
             self.contador = 0
         self.image = self.imagenes[self.contador]
 
+        # Margenes para que la raqueta no se salga de la pantalla
         estado_teclas = pg.key.get_pressed()
         if estado_teclas[pg.K_LEFT]:
             if self.rect.x <= 0:
@@ -52,19 +53,21 @@ class Raqueta(pg.sprite.Sprite):
 
 class Pelota:
 
-    vel_pelota = 25
+    vel_pelota = 20
 
     def __init__(self, rect_raqueta):
+        # paso como parámetro el rectangulo de la raqueta
         self.rect_raqueta = rect_raqueta
         self.juego_iniciado = False
+        self.velocidad_x = choice([-self.vel_pelota, self.vel_pelota])
+        self.velocidad_y = randint(-self.vel_pelota, -5)
+
         ruta_pelota = os.path.join('resources', 'images', 'ball1.png')
         self.pelota = pg.image.load(ruta_pelota)
         self.rect = self.pelota.get_rect(
             midbottom=(ANCHO/2, ALTO - Raqueta.margen - self.rect_raqueta.height))
-        self.velocidad_x = choice([-self.vel_pelota, self.vel_pelota])
-        self.velocidad_y = randint(-self.vel_pelota, -5)
 
-    def mover(self):
+    def update(self):
 
         estado_teclas = pg.key.get_pressed()
         if estado_teclas[pg.K_a]:

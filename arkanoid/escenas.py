@@ -85,12 +85,12 @@ class Partida(Escena):
             self.pintar_fondo()
             self.jugador.update()
             self.pantalla.blit(self.jugador.image, self.jugador.rect)
+            self.pelota.update()
             self.comprobar_colision()
             self.pantalla.blit(self.pelota.pelota, self.pelota.rect)
             pg.display.flip()
 
     def comprobar_colision(self):
-        self.pelota.mover()
         if self.pelota.rect.colliderect(self.jugador.rect):
             self.pelota.velocidad_y = randint(-self.pelota.vel_pelota, -5)
             self.pelota.velocidad_x = choice(
