@@ -7,7 +7,7 @@ from random import randint, choice
 
 # tus dependencias
 from . import ALTO, ANCHO, FPS
-from .entidades import Raqueta, Pelota, Ladrillo
+from .entidades import IndicadorVida, Ladrillo, Pelota, Raqueta
 
 
 class Escena:
@@ -71,31 +71,40 @@ class Partida(Escena):
         ruta_fondo = os.path.join('resources', 'images', 'background.jpg')
         self.fondo = pg.image.load(ruta_fondo)
         self.jugador = Raqueta()
-        self.muro = []
+        self.muro = pg.sprite.Group()
         self.crear_muro()
-        self.pelota = Pelota(self.jugador.rect)
+        self.pelota = Pelota(self.jugador)
+        self.indicador_vidas = pg.sprite.Group()
+        self.crear_vidas(self.pelota.vidas)
 
     def bucle_principal(self):
         super().bucle_principal()
         print('Estamos en el bucle principal de PARTIDA')
         salir = False
+        juego_iniciado = False
         while not salir:
             self.reloj.tick(FPS)
             for evento in pg.event.get():
                 if evento.type == pg.QUIT:
                     return True
+                if evento.type == pg.KEYDOWN and evento.key == pg.K_SPACE:
+                    juego_iniciado = True
             self.pintar_fondo()
             self.jugador.update()
             self.pantalla.blit(self.jugador.image, self.jugador.rect)
-            self.pelota.update()
+            juego_iniciado = self.pelota.update(juego_iniciado)
+            self.restar_vida(self.pelota.restar_vida)
             self.comprobar_colision()
-            self.pantalla.blit(self.pelota.pelota, self.pelota.rect)
+            self.pantalla.blit(self.pelota.image, self.pelota.rect)
+            self.muro.draw(self.pantalla)
+            self.indicador_vidas.update()
+            self.indicador_vidas.draw(self.pantalla)
             pg.display.flip()
 
     def comprobar_colision(self):
         if self.pelota.rect.colliderect(self.jugador.rect):
-            self.pelota.velocidad_y = randint(-self.pelota.vel_pelota, -5)
-            self.pelota.velocidad_x = choice(
+            self.pelota.vel_y = randint(-self.pelota.vel_pelota, -5)
+            self.pelota.vel_x = choice(
                 [-self.pelota.vel_pelota, self.pelota.vel_pelota])
 
     def pintar_fondo(self):
@@ -105,13 +114,32 @@ class Partida(Escena):
         self.pantalla.blit(self.fondo, (600, 0))
 
     def crear_muro(self):
-        filas = 4
+        filas = 8
         columnas = 6
+        margen_superior = 25
+        ladrillo = Ladrillo()
+        margen_inzquierdo = (ANCHO - columnas *
+                             ladrillo.rect.width) / 2
 
         for fila in range(filas):
             for col in range(columnas):
                 ladrillo = Ladrillo()
-                self.muro.append(ladrillo)
+                ladrillo.rect.x = ladrillo.rect.width * col + margen_inzquierdo
+                ladrillo.rect.y = ladrillo.rect.height * fila + margen_superior
+                self.muro.add(ladrillo)
+
+    def crear_vidas(self, vidas):
+        borde = 30
+
+        for vida in range(vidas):
+            indicador = IndicadorVida()
+            indicador.rect.x = indicador.rect.width * vida + borde
+            indicador.rect.y = ALTO - borde
+            self.indicador_vidas.add(indicador)
+
+    def restar_vida(self, restar_vida):
+        if restar_vida:
+            self.indicador_vidas.sprites()[-1].kill()
 
 
 class MejoresJugadores(Escena):
