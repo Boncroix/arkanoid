@@ -102,6 +102,7 @@ class Partida(Escena):
             pg.display.flip()
 
     def comprobar_colision(self):
+        if pg.sprite.collide_rect()
         if self.pelota.rect.colliderect(self.jugador.rect):
             self.pelota.vel_y = randint(-self.pelota.vel_pelota, -5)
             self.pelota.vel_x = choice(
