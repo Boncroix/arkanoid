@@ -32,12 +32,6 @@ class Raqueta(pg.sprite.Sprite):
             midbottom=(ANCHO / 2, ALTO - self.margen))
 
     def update(self):
-
-        self.rect1 = pg.Rect(self.rect.left, self.rect.top,
-                             self.rect.width / 2, self.rect.height)
-        self.rect2 = pg.Rect(self.rect.centerx, self.rect.top,
-                             self.rect.width / 2, self.rect.height)
-
         # 00 -> 01 -> 02 -> 00 -> 01 -> 02
         self.contador += 1
         if self.contador > 2:
@@ -95,6 +89,16 @@ class Pelota(pg.sprite.Sprite):
         return juego_iniciado
 
     def hay_colision(self):
+
+        if pg.sprite.collide_mask(self, self.raqueta):
+            self.vel_y = -self.vel_pelota
+            if self.rect.centerx > self.raqueta.rect.centerx:
+                self.vel_x = randint(0, self.vel_pelota)
+            elif self.rect.centerx < self.raqueta.rect.centerx:
+                self.vel_x = randint(-self.vel_pelota, 0)
+            else:
+                self.vel_x = 0
+
         '''
         if self.rect.colliderect(self.raqueta.rect1):
             self.vel_y = -self.vel_pelota
@@ -104,10 +108,14 @@ class Pelota(pg.sprite.Sprite):
             self.vel_x = randint(0, self.vel_pelota)
         '''
 
+        '''
+
         if pg.sprite.collide_mask(self, self.raqueta):
             self.vel_y = -self.vel_pelota
             self.vel_x = randint(-self.vel_pelota,
                                  self.vel_pelota)
+            
+        '''
 
     def pierdes(self):
         self.restar_vida = True

@@ -98,7 +98,14 @@ class Partida(Escena):
             self.muro.draw(self.pantalla)
             self.indicador_vidas.update()
             self.indicador_vidas.draw(self.pantalla)
+            self.detectar_colision_muro()
             pg.display.flip()
+
+    def detectar_colision_muro(self):
+        golpeados = pg.sprite.spritecollide(self.pelota, self.muro, True)
+        if len(golpeados) > 0:
+            print(f'golpeados {len(golpeados)}, ladrillos')
+            self.pelota.vel_y = -self.pelota.vel_y
 
     def pintar_fondo(self):
         ajuste_imagen = 10
