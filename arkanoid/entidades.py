@@ -32,6 +32,12 @@ class Raqueta(pg.sprite.Sprite):
             midbottom=(ANCHO / 2, ALTO - self.margen))
 
     def update(self):
+
+        self.rect1 = pg.Rect(self.rect.left, self.rect.top,
+                             self.rect.width / 2, self.rect.height)
+        self.rect2 = pg.Rect(self.rect.centerx, self.rect.top,
+                             self.rect.width / 2, self.rect.height)
+
         # 00 -> 01 -> 02 -> 00 -> 01 -> 02
         self.contador += 1
         if self.contador > 2:

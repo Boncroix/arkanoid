@@ -6,7 +6,7 @@ import pygame as pg
 from random import randint, choice
 
 # tus dependencias
-from . import ALTO, ANCHO, FPS
+from . import ALTO, ANCHO, COLOR_FONDO, FPS
 from .entidades import IndicadorVida, Ladrillo, Pelota, Raqueta
 
 
@@ -102,17 +102,26 @@ class Partida(Escena):
             pg.display.flip()
 
     def comprobar_colision(self):
-        if pg.sprite.collide_rect()
-        if self.pelota.rect.colliderect(self.jugador.rect):
-            self.pelota.vel_y = randint(-self.pelota.vel_pelota, -5)
-            self.pelota.vel_x = choice(
-                [-self.pelota.vel_pelota, self.pelota.vel_pelota])
+        if self.pelota.rect.colliderect(self.jugador.rect1):
+            self.pelota.vel_y = -self.pelota.vel_pelota
+            self.pelota.vel_x = randint(-self.pelota.vel_pelota, 0)
+        if self.pelota.rect.colliderect(self.jugador.rect2):
+            self.pelota.vel_y = -self.pelota.vel_pelota
+            self.pelota.vel_x = randint(0, self.pelota.vel_pelota)
 
     def pintar_fondo(self):
-        self.pantalla.fill((0, 0, 99))
+        ajuste_imagen = 10
+
+        self.pantalla.fill(COLOR_FONDO)
         # TODO: mejorar la lógica para 'rellenar' el fondo
         self.pantalla.blit(self.fondo, (0, 0))
-        self.pantalla.blit(self.fondo, (600, 0))
+        if ANCHO > self.fondo.get_width():
+            self.pantalla.blit(self.fondo, (self.fondo.get_width(), 0))
+        if ALTO > self.fondo.get_height():
+            self.pantalla.blit(
+                self.fondo, (0, self.fondo.get_height() - ajuste_imagen))
+            self.pantalla.blit(
+                self.fondo, (self.fondo.get_width(), self.fondo.get_height() - ajuste_imagen))
 
     def crear_muro(self):
         filas = 8
@@ -131,12 +140,15 @@ class Partida(Escena):
 
     def crear_vidas(self, vidas):
         borde = 30
+        separador = 5
 
         for vida in range(vidas):
+
             indicador = IndicadorVida()
-            indicador.rect.x = indicador.rect.width * vida + borde
+            indicador.rect.x = indicador.rect.width * vida + borde + separador * vida
             indicador.rect.y = ALTO - borde
             self.indicador_vidas.add(indicador)
+        print(self.indicador_vidas)
 
     def restar_vida(self, restar_vida):
         if restar_vida:
