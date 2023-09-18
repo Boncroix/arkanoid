@@ -72,8 +72,8 @@ class Pelota(pg.sprite.Sprite):
     def update(self, juego_iniciado):
 
         if not juego_iniciado:
-            self.vel_x = choice([-self.vel_pelota, self.vel_pelota])
             self.rect = self.image.get_rect(midbottom=self.raqueta.rect.midtop)
+            self.vel_x = choice([-self.vel_pelota, self.vel_pelota])
             self.vel_y = randint(-self.vel_pelota, -5)
             self.reset()
         else:
@@ -89,7 +89,25 @@ class Pelota(pg.sprite.Sprite):
                 self.pierdes()
                 juego_iniciado = False
                 return juego_iniciado
+
+            self.hay_colision()
+
         return juego_iniciado
+
+    def hay_colision(self):
+        '''
+        if self.rect.colliderect(self.raqueta.rect1):
+            self.vel_y = -self.vel_pelota
+            self.vel_x = randint(-self.vel_pelota, 0)
+        if self.rect.colliderect(self.raqueta.rect2):
+            self.vel_y = -self.vel_pelota
+            self.vel_x = randint(0, self.vel_pelota)
+        '''
+
+        if pg.sprite.collide_mask(self, self.raqueta):
+            self.vel_y = -self.vel_pelota
+            self.vel_x = randint(-self.vel_pelota,
+                                 self.vel_pelota)
 
     def pierdes(self):
         self.restar_vida = True

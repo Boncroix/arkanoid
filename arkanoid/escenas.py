@@ -94,26 +94,11 @@ class Partida(Escena):
             self.pantalla.blit(self.jugador.image, self.jugador.rect)
             juego_iniciado = self.pelota.update(juego_iniciado)
             self.restar_vida(self.pelota.restar_vida)
-            self.comprobar_colision()
             self.pantalla.blit(self.pelota.image, self.pelota.rect)
             self.muro.draw(self.pantalla)
             self.indicador_vidas.update()
             self.indicador_vidas.draw(self.pantalla)
             pg.display.flip()
-
-    def comprobar_colision(self):
-        '''
-        if self.pelota.rect.colliderect(self.jugador.rect1):
-            self.pelota.vel_y = -self.pelota.vel_pelota
-            self.pelota.vel_x = randint(-self.pelota.vel_pelota, 0)
-        if self.pelota.rect.colliderect(self.jugador.rect2):
-            self.pelota.vel_y = -self.pelota.vel_pelota
-            self.pelota.vel_x = randint(0, self.pelota.vel_pelota)
-            '''
-        if pg.sprite.collide_rect(self.jugador, self.pelota):
-            self.pelota.vel_y = -self.pelota.vel_pelota
-            self.pelota.vel_x = randint(-self.pelota.vel_pelota,
-                                        self.pelota.vel_pelota)
 
     def pintar_fondo(self):
         ajuste_imagen = 10
