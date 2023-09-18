@@ -102,12 +102,18 @@ class Partida(Escena):
             pg.display.flip()
 
     def comprobar_colision(self):
+        '''
         if self.pelota.rect.colliderect(self.jugador.rect1):
             self.pelota.vel_y = -self.pelota.vel_pelota
             self.pelota.vel_x = randint(-self.pelota.vel_pelota, 0)
         if self.pelota.rect.colliderect(self.jugador.rect2):
             self.pelota.vel_y = -self.pelota.vel_pelota
             self.pelota.vel_x = randint(0, self.pelota.vel_pelota)
+            '''
+        if pg.sprite.collide_rect(self.jugador, self.pelota):
+            self.pelota.vel_y = -self.pelota.vel_pelota
+            self.pelota.vel_x = randint(-self.pelota.vel_pelota,
+                                        self.pelota.vel_pelota)
 
     def pintar_fondo(self):
         ajuste_imagen = 10
