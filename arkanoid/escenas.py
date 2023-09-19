@@ -6,8 +6,8 @@ import pygame as pg
 from random import randint, choice
 
 # tus dependencias
-from . import ALTO, ANCHO, COLOR_FONDO, FPS
-from .entidades import IndicadorVida, Ladrillo, Pelota, Raqueta
+from . import ALTO, ANCHO, COLOR_FONDO, FPS, VIDAS
+from .entidades import ContadorVidas, IndicadorVida, Ladrillo, Pelota, Raqueta
 
 
 class Escena:
@@ -76,12 +76,14 @@ class Partida(Escena):
         self.pelota = Pelota(self.jugador)
         self.indicador_vidas = pg.sprite.Group()
         self.crear_vidas(self.pelota.vidas)
+        self.contador_vidas = ContadorVidas(VIDAS)
 
     def bucle_principal(self):
         super().bucle_principal()
         print('Estamos en el bucle principal de PARTIDA')
         salir = False
         juego_iniciado = False
+        restar_vida = False
         while not salir:
             self.reloj.tick(FPS)
             for evento in pg.event.get():
@@ -92,19 +94,27 @@ class Partida(Escena):
             self.pintar_fondo()
             self.jugador.update()
             self.pantalla.blit(self.jugador.image, self.jugador.rect)
-            juego_iniciado = self.pelota.update(juego_iniciado)
-            self.restar_vida(self.pelota.restar_vida)
+            self.pelota.update(juego_iniciado)
+            self.restar_vida(restar_vida)
             self.pantalla.blit(self.pelota.image, self.pelota.rect)
             self.muro.draw(self.pantalla)
             self.indicador_vidas.update()
             self.indicador_vidas.draw(self.pantalla)
             self.detectar_colision_muro()
+
             pg.display.flip()
 
+            if self.pelota.he_perdido:
+                restar_vida = False
+                salir, restar_vida = self.contador_vidas.perder_vida()
+                self.pelota.he_perdido = False
+                juego_iniciado = False
+
     def detectar_colision_muro(self):
-        golpeados = pg.sprite.spritecollide(self.pelota, self.muro, True)
+        golpeados = pg.sprite.spritecollide(self.pelota, self.muro, False)
         if len(golpeados) > 0:
-            print(f'golpeados {len(golpeados)}, ladrillos')
+            for ladrillo in golpeados:
+                ladrillo.update(self.muro)
             self.pelota.vel_y = -self.pelota.vel_y
 
     def pintar_fondo(self):
@@ -122,17 +132,23 @@ class Partida(Escena):
                 self.fondo, (self.fondo.get_width(), self.fondo.get_height() - ajuste_imagen))
 
     def crear_muro(self):
-        filas = 8
-        columnas = 6
-        margen_superior = 25
-        ladrillo = Ladrillo()
-        margen_inzquierdo = (ANCHO - columnas *
-                             ladrillo.rect.width) / 2
+        filas = 6
+        columnas = 7
+        margen_superior = 20
+        tipo = None
 
-        for fila in range(filas):
+        for fila in range(filas):   # 0-3
             for col in range(columnas):
-                ladrillo = Ladrillo()
-                ladrillo.rect.x = ladrillo.rect.width * col + margen_inzquierdo
+                # por aquí voy a pasar filas*columnas = 24 veces
+                if tipo == Ladrillo.ROJO:
+                    tipo = Ladrillo.VERDE
+                else:
+                    tipo = Ladrillo.ROJO
+                ladrillo = Ladrillo(tipo)
+                margen_izquierdo = (ANCHO - columnas * ladrillo.rect.width) / 2
+                # x = ancho_lad * col
+                # y = alto_lad * fila
+                ladrillo.rect.x = ladrillo.rect.width * col + margen_izquierdo
                 ladrillo.rect.y = ladrillo.rect.height * fila + margen_superior
                 self.muro.add(ladrillo)
 
@@ -151,6 +167,26 @@ class Partida(Escena):
     def restar_vida(self, restar_vida):
         if restar_vida:
             self.indicador_vidas.sprites()[-1].kill()
+
+        filas = 6
+        columnas = 9
+        margen_superior = 20
+        tipo = None
+
+        for fila in range(filas):   # 0-3
+            for col in range(columnas):
+                # por aquí voy a pasar filas*columnas = 24 veces
+                if tipo == Ladrillo.ROJO:
+                    tipo = Ladrillo.VERDE
+                else:
+                    tipo = Ladrillo.ROJO
+                ladrillo = Ladrillo(tipo)
+                margen_izquierdo = (ANCHO - columnas * ladrillo.rect.width) / 2
+                # x = ancho_lad * col
+                # y = alto_lad * fila
+                ladrillo.rect.x = ladrillo.rect.width * col + margen_izquierdo
+                ladrillo.rect.y = ladrillo.rect.height * fila + margen_superior
+                self.muro.add(ladrillo)
 
 
 class MejoresJugadores(Escena):

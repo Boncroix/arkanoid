@@ -62,6 +62,7 @@ class Pelota(pg.sprite.Sprite):
         ruta_pelota = os.path.join('resources', 'images', 'ball1.png')
         self.image = pg.image.load(ruta_pelota)
         self.rect = self.image.get_rect(midbottom=self.raqueta.rect.midtop)
+        self.he_perdido = False
 
     def update(self, juego_iniciado):
 
@@ -69,7 +70,7 @@ class Pelota(pg.sprite.Sprite):
             self.rect = self.image.get_rect(midbottom=self.raqueta.rect.midtop)
             self.vel_x = choice([-self.vel_pelota, self.vel_pelota])
             self.vel_y = randint(-self.vel_pelota, -5)
-            self.reset()
+
         else:
             self.rect.x += self.vel_x
             if self.rect.left <= 0 or self.rect.right > ANCHO:
@@ -80,13 +81,9 @@ class Pelota(pg.sprite.Sprite):
                 self.vel_y = -self.vel_y
 
             if self.rect.top >= ALTO:
-                self.pierdes()
-                juego_iniciado = False
-                return juego_iniciado
+                self.he_perdido = True
 
             self.hay_colision()
-
-        return juego_iniciado
 
     def hay_colision(self):
 
@@ -118,23 +115,35 @@ class Pelota(pg.sprite.Sprite):
         '''
 
     def pierdes(self):
-        self.restar_vida = True
-        self.vidas -= 1
+        pass
 
     def reset(self):
-        self.restar_vida = False
+        pass
 
 
 class Ladrillo(pg.sprite.Sprite):
+    VERDE = 0
+    ROJO = 1
+    ROJO_ROTO = 2
+    IMG_LADRILLO = ['greenTile.png', 'redTile.png', 'redTileBreak.png']
 
-    def __init__(self):
+    def __init__(self, color=VERDE):
         super().__init__()
-        ruta_verde = os.path.join('resources', 'images', 'greenTile.png')
-        self.image = pg.image.load(ruta_verde)
+        self.tipo = color
+        self.imagenes = []
+        for img in self.IMG_LADRILLO:
+            ruta = os.path.join(
+                'resources', 'images', img)
+            self.imagenes.append(pg.image.load(ruta))
+        self.image = self.imagenes[color]
         self.rect = self.image.get_rect()
 
-    def undate(self):
-        pass
+    def update(self, muro):
+        if self.tipo == Ladrillo.ROJO:
+            self.tipo = Ladrillo.ROJO_ROTO
+        else:
+            muro.remove(self)
+        self.image = self.imagenes[self.tipo]
 
 
 class IndicadorVida(pg.sprite.Sprite):
@@ -163,3 +172,15 @@ class IndicadorVida(pg.sprite.Sprite):
         if self.contador > 2:
             self.contador = 0
         self.image = self.imagenes[self.contador]
+
+
+class ContadorVidas:
+    def __init__(self, vidas_iniciales):
+        self.vidas = vidas_iniciales
+
+    def perder_vida(self):
+        self.vidas -= 1
+        return self.vidas == 0, True
+
+    def pintar(self):
+        pass
