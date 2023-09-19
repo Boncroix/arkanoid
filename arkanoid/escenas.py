@@ -95,7 +95,6 @@ class Partida(Escena):
             self.jugador.update()
             self.pantalla.blit(self.jugador.image, self.jugador.rect)
             self.pelota.update(juego_iniciado)
-            self.restar_vida(restar_vida)
             self.pantalla.blit(self.pelota.image, self.pelota.rect)
             self.muro.draw(self.pantalla)
             self.indicador_vidas.update()
@@ -106,7 +105,8 @@ class Partida(Escena):
 
             if self.pelota.he_perdido:
                 restar_vida = False
-                salir, restar_vida = self.contador_vidas.perder_vida()
+                salir = self.contador_vidas.perder_vida()
+                self.restar_vida()
                 self.pelota.he_perdido = False
                 juego_iniciado = False
 
@@ -164,29 +164,8 @@ class Partida(Escena):
             self.indicador_vidas.add(indicador)
         print(self.indicador_vidas)
 
-    def restar_vida(self, restar_vida):
-        if restar_vida:
-            self.indicador_vidas.sprites()[-1].kill()
-
-        filas = 6
-        columnas = 9
-        margen_superior = 20
-        tipo = None
-
-        for fila in range(filas):   # 0-3
-            for col in range(columnas):
-                # por aquí voy a pasar filas*columnas = 24 veces
-                if tipo == Ladrillo.ROJO:
-                    tipo = Ladrillo.VERDE
-                else:
-                    tipo = Ladrillo.ROJO
-                ladrillo = Ladrillo(tipo)
-                margen_izquierdo = (ANCHO - columnas * ladrillo.rect.width) / 2
-                # x = ancho_lad * col
-                # y = alto_lad * fila
-                ladrillo.rect.x = ladrillo.rect.width * col + margen_izquierdo
-                ladrillo.rect.y = ladrillo.rect.height * fila + margen_superior
-                self.muro.add(ladrillo)
+    def restar_vida(self):
+        self.indicador_vidas.sprites()[-1].kill()
 
 
 class MejoresJugadores(Escena):

@@ -70,6 +70,7 @@ class Pelota(pg.sprite.Sprite):
             self.rect = self.image.get_rect(midbottom=self.raqueta.rect.midtop)
             self.vel_x = choice([-self.vel_pelota, self.vel_pelota])
             self.vel_y = randint(-self.vel_pelota, -5)
+            self.he_perdido = False
 
         else:
             self.rect.x += self.vel_x
@@ -180,7 +181,7 @@ class ContadorVidas:
 
     def perder_vida(self):
         self.vidas -= 1
-        return self.vidas == 0, True
+        return self.vidas == 0
 
     def pintar(self):
         pass
