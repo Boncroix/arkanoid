@@ -8,7 +8,7 @@ from random import choice, randint
 
 
 # mis imports
-from .import ALTO, ANCHO
+from .import ALTO, ALTO_MARCADOR, ANCHO
 
 
 class Raqueta(pg.sprite.Sprite):
@@ -54,7 +54,6 @@ class Raqueta(pg.sprite.Sprite):
 class Pelota(pg.sprite.Sprite):
 
     vel_pelota = 20
-    vidas = 3
 
     def __init__(self, raqueta):
         super().__init__()
@@ -74,11 +73,12 @@ class Pelota(pg.sprite.Sprite):
 
         else:
             self.rect.x += self.vel_x
+            self.rect.y += self.vel_y
+
             if self.rect.left <= 0 or self.rect.right > ANCHO:
                 self.vel_x = -self.vel_x
 
-            self.rect.y += self.vel_y
-            if self.rect.top <= 0:
+            if self.rect.top <= ALTO_MARCADOR:
                 self.vel_y = -self.vel_y
 
             if self.rect.top >= ALTO:
@@ -128,7 +128,7 @@ class Ladrillo(pg.sprite.Sprite):
     ROJO_ROTO = 2
     IMG_LADRILLO = ['greenTile.png', 'redTile.png', 'redTileBreak.png']
 
-    def __init__(self, color=VERDE):
+    def __init__(self, puntos, color=VERDE):
         super().__init__()
         self.tipo = color
         self.imagenes = []
@@ -138,13 +138,19 @@ class Ladrillo(pg.sprite.Sprite):
             self.imagenes.append(pg.image.load(ruta))
         self.image = self.imagenes[color]
         self.rect = self.image.get_rect()
+        self.puntos = puntos
 
     def update(self, muro):
+        '''
+        Según tipo de ladrillo devolvemos True o False si el ladrillo se rompe
+        '''
         if self.tipo == Ladrillo.ROJO:
             self.tipo = Ladrillo.ROJO_ROTO
+            self.image = self.imagenes[self.tipo]
+            return False
         else:
             muro.remove(self)
-        self.image = self.imagenes[self.tipo]
+            return True
 
 
 class IndicadorVida(pg.sprite.Sprite):
@@ -185,3 +191,25 @@ class ContadorVidas:
 
     def pintar(self):
         pass
+
+
+class Marcador:
+    def __init__(self):
+        self.valor = 0
+        fuente = 'LibreFranklin-VariableFont_wght.ttf'
+        ruta = os.path.join('resources', 'fonts', fuente)
+        self.tipografia = pg.font.Font(ruta, 35)
+
+    def aumentar(self, incremento):
+        self.valor += incremento
+
+    def pintar(self, pantalla):
+        r = pg.rect.Rect(0, 0, ANCHO, ALTO_MARCADOR)
+        pg.draw.rect(pantalla, (0, 0, 0), r)
+        cadena = str(self.valor)
+        texto = self.tipografia.render(cadena, True, (230, 189, 55))
+        pos_x = 20
+        pos_y = 10
+        pantalla.blit(texto, (pos_x, pos_y))
+
+        # TODO: acciones para pintar el marcador en pantalla

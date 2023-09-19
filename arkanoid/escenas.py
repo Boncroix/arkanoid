@@ -7,7 +7,9 @@ from random import randint, choice
 
 # tus dependencias
 from . import ALTO, ANCHO, COLOR_FONDO, FPS, VIDAS
-from .entidades import ContadorVidas, IndicadorVida, Ladrillo, Pelota, Raqueta
+from .entidades import (ContadorVidas,
+                        IndicadorVida, Ladrillo, Marcador, Pelota, Raqueta
+                        )
 
 
 class Escena:
@@ -75,8 +77,9 @@ class Partida(Escena):
         self.crear_muro()
         self.pelota = Pelota(self.jugador)
         self.indicador_vidas = pg.sprite.Group()
-        self.crear_vidas(self.pelota.vidas)
         self.contador_vidas = ContadorVidas(VIDAS)
+        self.crear_vidas(VIDAS)
+        self.marcador = Marcador()
 
     def bucle_principal(self):
         super().bucle_principal()
@@ -100,6 +103,7 @@ class Partida(Escena):
             self.indicador_vidas.update()
             self.indicador_vidas.draw(self.pantalla)
             self.detectar_colision_muro()
+            self.marcador.pintar(self.pantalla)
 
             pg.display.flip()
 
@@ -114,7 +118,9 @@ class Partida(Escena):
         golpeados = pg.sprite.spritecollide(self.pelota, self.muro, False)
         if len(golpeados) > 0:
             for ladrillo in golpeados:
-                ladrillo.update(self.muro)
+                if ladrillo.update(self.muro):
+                    self.marcador.aumentar(ladrillo.puntos)
+
             self.pelota.vel_y = -self.pelota.vel_y
 
     def pintar_fondo(self):
@@ -134,7 +140,7 @@ class Partida(Escena):
     def crear_muro(self):
         filas = 6
         columnas = 7
-        margen_superior = 20
+        margen_superior = 60
         tipo = None
 
         for fila in range(filas):   # 0-3
@@ -144,13 +150,15 @@ class Partida(Escena):
                     tipo = Ladrillo.VERDE
                 else:
                     tipo = Ladrillo.ROJO
-                ladrillo = Ladrillo(tipo)
+                puntos = (tipo+1)*(20-fila*2)
+                ladrillo = Ladrillo(puntos, tipo)
                 margen_izquierdo = (ANCHO - columnas * ladrillo.rect.width) / 2
                 # x = ancho_lad * col
                 # y = alto_lad * fila
                 ladrillo.rect.x = ladrillo.rect.width * col + margen_izquierdo
                 ladrillo.rect.y = ladrillo.rect.height * fila + margen_superior
                 self.muro.add(ladrillo)
+                print(tipo, fila, col, puntos)
 
     def crear_vidas(self, vidas):
         borde = 30
@@ -162,7 +170,6 @@ class Partida(Escena):
             indicador.rect.x = indicador.rect.width * vida + borde + separador * vida
             indicador.rect.y = ALTO - borde
             self.indicador_vidas.add(indicador)
-        print(self.indicador_vidas)
 
     def restar_vida(self):
         self.indicador_vidas.sprites()[-1].kill()
