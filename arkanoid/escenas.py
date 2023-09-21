@@ -158,7 +158,6 @@ class Partida(Escena):
                 ladrillo.rect.x = ladrillo.rect.width * col + margen_izquierdo
                 ladrillo.rect.y = ladrillo.rect.height * fila + margen_superior
                 self.muro.add(ladrillo)
-                print(tipo, fila, col, puntos)
 
     def crear_vidas(self, vidas):
         borde = 30

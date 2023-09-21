@@ -75,10 +75,16 @@ class Pelota(pg.sprite.Sprite):
             self.rect.x += self.vel_x
             self.rect.y += self.vel_y
 
-            if self.rect.left <= 0 or self.rect.right > ANCHO:
+            if self.rect.left <= 0:
+                self.rect.left = 0
+                self.vel_x = -self.vel_x
+
+            if self.rect.right >= ANCHO:
+                self.rect.right = ANCHO
                 self.vel_x = -self.vel_x
 
             if self.rect.top <= ALTO_MARCADOR:
+                self.rect.top = ALTO_MARCADOR
                 self.vel_y = -self.vel_y
 
             if self.rect.top >= ALTO:
