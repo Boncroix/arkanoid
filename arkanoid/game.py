@@ -11,9 +11,10 @@ class Arkanoid:
 
         portada = Portada(self.pantalla)
         partida = Partida(self.pantalla)
-        records = MejoresJugadores(self.pantalla)
+        records = MejoresJugadores(self.pantalla, partida.marcador)
 
         self.escenas = [
+            records,
             portada,
             partida,
             records

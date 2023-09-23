@@ -1,7 +1,11 @@
 import csv
 import os
+import pygame as pg
 
+# mis imports
+from .import ALTO, ALTO_MARCADOR, ANCHO
 MAX_RECORDS = 10
+COLOR_TIPOGAFRIA = (255, 255, 255)
 
 
 class Records:
@@ -11,6 +15,8 @@ class Records:
     file_dir = os.path.dirname(os.path.realpath(__file__))
 
     def __init__(self):
+        ruta = os.path.join('resources', 'fonts', 'CabinSketch-Bold.ttf')
+        self.tipo = pg.font.Font(ruta, 35)
         self.game_records = []
         self.data_path = os.path.join(
             os.path.dirname(self.file_dir),
@@ -69,3 +75,28 @@ class Records:
         for cont in range(MAX_RECORDS):
             self.game_records.append(['-----', 0])
         self.guardar()
+
+    def pintame(self, pantalla, puntos):
+        mensajes = ['Your Score', str(puntos)]
+        pos_y = ALTO_MARCADOR
+        for mensaje in mensajes:
+            texto = self.tipo.render(mensaje, True, COLOR_TIPOGAFRIA)
+            pos_x = (ANCHO - texto.get_width()) / 2
+            pantalla.blit(texto, (pos_x, pos_y))
+            pos_y += texto.get_height()
+
+        pos_y = ALTO * 1/4
+        for record in self.game_records:
+            mensaje = str(record[0])
+            separador = '----'
+            mensaje1 = str(record[1])
+            texto = self.tipo.render(mensaje, True, COLOR_TIPOGAFRIA)
+            separador = self.tipo.render(separador, True, COLOR_TIPOGAFRIA)
+            texto1 = self.tipo.render(mensaje1, True, COLOR_TIPOGAFRIA)
+            pos_x = (ANCHO * 1/3 - (texto.get_width() / 2))
+            pos_x1 = (ANCHO - separador.get_width()) / 2
+            pos_x2 = (ANCHO * 2/3 - (texto1.get_width() / 2))
+            pantalla.blit(texto, (pos_x, pos_y))
+            pantalla.blit(separador, (pos_x1, pos_y))
+            pantalla.blit(texto1, (pos_x2, pos_y))
+            pos_y += texto1.get_height()

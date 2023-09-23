@@ -193,7 +193,7 @@ class ContadorVidas:
 
     def perder_vida(self):
         self.vidas -= 1
-        return self.vidas == 0
+        return self.vidas < 0
 
     def pintar(self):
         pass
@@ -217,5 +217,3 @@ class Marcador:
         pos_x = 20
         pos_y = 10
         pantalla.blit(texto, (pos_x, pos_y))
-
-        # TODO: acciones para pintar el marcador en pantalla

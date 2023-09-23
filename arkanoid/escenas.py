@@ -10,6 +10,7 @@ from . import ALTO, ANCHO, COLOR_FONDO, FPS, VIDAS
 from .entidades import (ContadorVidas,
                         IndicadorVida, Ladrillo, Marcador, Pelota, Raqueta
                         )
+from .records import Records
 
 
 class Escena:
@@ -86,7 +87,6 @@ class Partida(Escena):
         print('Estamos en el bucle principal de PARTIDA')
         salir = False
         juego_iniciado = False
-        restar_vida = False
         while not salir:
             self.reloj.tick(FPS)
             for evento in pg.event.get():
@@ -108,9 +108,9 @@ class Partida(Escena):
             pg.display.flip()
 
             if self.pelota.he_perdido:
-                restar_vida = False
                 salir = self.contador_vidas.perder_vida()
-                self.restar_vida()
+                if len(self.indicador_vidas) > 0:
+                    self.restar_vida()
                 self.pelota.he_perdido = False
                 juego_iniciado = False
 
@@ -127,7 +127,6 @@ class Partida(Escena):
         ajuste_imagen = 10
 
         self.pantalla.fill(COLOR_FONDO)
-        # TODO: mejorar la lógica para 'rellenar' el fondo
         self.pantalla.blit(self.fondo, (0, 0))
         if ANCHO > self.fondo.get_width():
             self.pantalla.blit(self.fondo, (self.fondo.get_width(), 0))
@@ -175,13 +174,31 @@ class Partida(Escena):
 
 
 class MejoresJugadores(Escena):
+    def __init__(self, pantalla, marcador):
+        super().__init__(pantalla)
+        self.marcador = marcador
+        ruta_image = os.path.join('resources', 'images', 'score.jpeg')
+        self.image = pg.image.load(ruta_image)
+        self.image = pg.transform.scale(self.image, (ALTO, ANCHO))
+        self.records = Records()
+
     def bucle_principal(self):
         super().bucle_principal()
         print('Estamos en el bucle principal de MEJORESJUGADORES')
+        self.comprobar_puntuacion()
         salir = False
         while not salir:
             for evento in pg.event.get():
                 if evento.type == pg.QUIT:
                     return True
-            self.pantalla.fill((0, 0, 99))
+            self.pintar_fondo()
+            self.records.pintame(self.pantalla, self.marcador.valor)
             pg.display.flip()
+
+    def pintar_fondo(self):
+        self.pantalla.blit(self.image, (0, 0))
+
+    def comprobar_puntuacion(self):
+        if self.marcador.valor > self.records.puntuacion_menor():
+            self.records.insertar_record('jbc', self.marcador.valor)
+            print(self.records.game_records)
