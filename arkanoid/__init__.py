@@ -1,7 +1,18 @@
+import os
+import pygame as pg
+
+# JUEGO
+FPS = 30
+VIDAS = 1
+
 # CONSTANTES PANTALLA
 ALTO = 800
 ANCHO = 800
-FPS = 30
-COLOR_FONDO = (0, 0, 99)
-VIDAS = 1
 ALTO_MARCADOR = 50
+
+# COLORES
+AZUL = (0, 0, 99)
+BLANCO = (255, 255, 255)
+ROJO = (255, 0, 0)
+
+# TIPOGRAFIAS

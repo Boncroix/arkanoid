@@ -6,17 +6,20 @@ import pygame as pg
 from random import randint, choice
 
 # tus dependencias
-from . import ALTO, ANCHO, COLOR_FONDO, FPS, VIDAS
+from . import ALTO, ALTO_MARCADOR, ANCHO, AZUL, BLANCO, FPS, ROJO, VIDAS
 from .entidades import (ContadorVidas,
                         IndicadorVida, Ladrillo, Marcador, Pelota, Raqueta
                         )
 from .records import Records
+
+FPS_MEJORES_JUGADORES = 15
 
 
 class Escena:
     def __init__(self, pantalla):
         self.pantalla = pantalla
         self.reloj = pg.time.Clock()
+        self.jugar_otra = False
 
     def bucle_principal(self):
         """
@@ -70,7 +73,6 @@ class Portada(Escena):
 class Partida(Escena):
     def __init__(self, pantalla):
         super().__init__(pantalla)
-
         ruta_fondo = os.path.join('resources', 'images', 'background.jpg')
         self.fondo = pg.image.load(ruta_fondo)
         self.jugador = Raqueta()
@@ -120,13 +122,15 @@ class Partida(Escena):
             for ladrillo in golpeados:
                 if ladrillo.update(self.muro):
                     self.marcador.aumentar(ladrillo.puntos)
-
             self.pelota.vel_y = -self.pelota.vel_y
+
+        if len(self.muro) == 0 and self.pelota.rect.top > 600:
+            self.crear_muro()
 
     def pintar_fondo(self):
         ajuste_imagen = 10
 
-        self.pantalla.fill(COLOR_FONDO)
+        self.pantalla.fill(AZUL)
         self.pantalla.blit(self.fondo, (0, 0))
         if ANCHO > self.fondo.get_width():
             self.pantalla.blit(self.fondo, (self.fondo.get_width(), 0))
@@ -176,7 +180,10 @@ class Partida(Escena):
 class MejoresJugadores(Escena):
     def __init__(self, pantalla, marcador):
         super().__init__(pantalla)
+        self.indicador = '-'
         self.marcador = marcador
+        ruta = os.path.join('resources', 'fonts', 'CabinSketch-Bold.ttf')
+        self.tipo = pg.font.Font(ruta, 35)
         ruta_image = os.path.join('resources', 'images', 'score.jpeg')
         self.image = pg.image.load(ruta_image)
         self.image = pg.transform.scale(self.image, (ALTO, ANCHO))
@@ -184,21 +191,74 @@ class MejoresJugadores(Escena):
 
     def bucle_principal(self):
         super().bucle_principal()
+        self.entrada_texto = ''
         print('Estamos en el bucle principal de MEJORESJUGADORES')
-        self.comprobar_puntuacion()
         salir = False
+        insertar_record = self.comprobar_puntuacion()
         while not salir:
+            self.reloj.tick(FPS_MEJORES_JUGADORES)
+            self.pintar_fondo()
             for evento in pg.event.get():
                 if evento.type == pg.QUIT:
                     return True
-            self.pintar_fondo()
-            self.records.pintame(self.pantalla, self.marcador.valor)
+                elif evento.type == pg.KEYDOWN and insertar_record:
+                    if evento.key == pg.K_BACKSPACE:
+                        self.entrada_texto = self.entrada_texto[:-1]
+                    elif evento.key == pg.K_RETURN:
+                        self.records.insertar_record(
+                            self.entrada_texto, self.marcador.valor)
+                        insertar_record = False
+                    else:
+                        self.entrada_texto += evento.unicode
+            if insertar_record:
+                self.pintar_mi_puntuacion()
+            else:
+                salir, self.jugar_otra = self.finalizar_partida()
+            self.records.pintar_records(self.pantalla)
             pg.display.flip()
 
     def pintar_fondo(self):
         self.pantalla.blit(self.image, (0, 0))
+        texto = self.tipo.render('GAME OVER', True, ROJO)
+        pos_x = (ANCHO - texto.get_width()) / 2
+        pos_y = ALTO * 6/7
+        self.pantalla.blit(texto, (pos_x, pos_y))
+        pos_y += texto.get_height()
 
     def comprobar_puntuacion(self):
-        if self.marcador.valor > self.records.puntuacion_menor():
-            self.records.insertar_record('jbc', self.marcador.valor)
-            print(self.records.game_records)
+        return self.marcador.valor > self.records.puntuacion_menor()
+
+    def pintar_mi_puntuacion(self):
+        if self.indicador == '-':
+            self.indicador = '  '
+        else:
+            self.indicador = '-'
+
+        mensajes = ['RECORD, INSERTA TU NOMBRE', str(self.entrada_texto) + self.indicador, str(
+            self.marcador.valor), 'Pulsa enter para insertar record']
+        pos_y = ALTO_MARCADOR
+        for mensaje in mensajes:
+            texto = self.tipo.render(mensaje, True, BLANCO)
+            pos_x = (ANCHO - texto.get_width()) / 2
+            self.pantalla.blit(texto, (pos_x, pos_y))
+            pos_y += texto.get_height()
+
+    def finalizar_partida(self):
+        if self.indicador == '-':
+            self.indicador = '  '
+        else:
+            self.indicador = '-'
+        mensajes = ('¿Jugamos Otra? S/N', self.indicador)
+        pos_y = ALTO_MARCADOR
+        for mensaje in mensajes:
+            texto = self.tipo.render(mensaje, True, BLANCO)
+            pos_x = (ANCHO - texto.get_width()) / 2
+            self.pantalla.blit(texto, (pos_x, pos_y))
+            pos_y += texto.get_height()
+
+        estado_teclas = pg.key.get_pressed()
+        if estado_teclas[pg.K_s]:
+            return True, True
+        if estado_teclas[pg.K_n]:
+            return True, False
+        return False, False
