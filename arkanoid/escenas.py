@@ -208,7 +208,7 @@ class MejoresJugadores(Escena):
                         self.records.insertar_record(
                             self.entrada_texto, self.marcador.valor)
                         insertar_record = False
-                    else:
+                    elif len(self.entrada_texto) < 9:
                         self.entrada_texto += evento.unicode
             if insertar_record:
                 self.pintar_mi_puntuacion()

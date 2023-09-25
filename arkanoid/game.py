@@ -21,7 +21,8 @@ class Arkanoid:
         while jugar_otra:
             portada = Portada(self.pantalla)
             partida = Partida(self.pantalla)
-            records = MejoresJugadores(self.pantalla, partida.marcador)
+            records = MejoresJugadores(
+                self.pantalla, partida.marcador)
 
             self.escenas = [
                 portada,
