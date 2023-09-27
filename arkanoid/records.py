@@ -58,7 +58,7 @@ class Records:
             writer.writerows(self.game_records)
 
     def cargar(self):
-        with open(self.file_path, mode='r') as records_file:
+        with open(self.file_path, mode='r', newline='\r\n') as records_file:
             reader = csv.reader(records_file)
             contador = 0
             self.game_records = []
